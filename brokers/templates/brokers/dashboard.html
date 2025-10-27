@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Courtier - Carbura{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Courtier</h1>
+            <p class="text-lg text-gray-600">Gérez vos missions et trouvez de nouvelles opportunités</p>
+        </div>
+        <div class="flex items-center space-x-4 mt-4 lg:mt-0">
+            {% if broker_profile.is_approved %}
+                <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Compte validé
+                </span>
+            {% else %}
+                <span class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-semibold flex items-center">
+                    <i class="fas fa-clock mr-2"></i>
+                    En attente de validation
+                </span>
+            {% endif %}
+            <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold flex items-center">
+                <i class="fas fa-star mr-2"></i>
+                Note: {{ broker_profile.rating }}/5
+            </span>
+            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-semibold flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                {{ broker_profile.completed_missions }} missions
+            </span>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-md border p-6 text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ my_missions.count }}</div>
+            <div class="text-sm text-gray-600">Missions totales</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md border p-6 text-center">
+            <div class="text-2xl font-bold text-green-600">
+                {{ my_missions|length|default:0 }}
+            </div>
+            <div class="text-sm text-gray-600">Missions actives</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md border p-6 text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ available_missions.count }}</div>
+            <div class="text-sm text-gray-600">Missions disponibles</div>
+        </div>
+        <div class="bg-white rounded-xl shadow-md border p-6 text-center">
+            <div class="text-2xl font-bold text-orange-600">{{ broker_profile.rating }}/5</div>
+            <div class="text-sm text-gray-600">Note moyenne</div>
+        </div>
+    </div>
+
+    <!-- Account Status Alert -->
+    {% if not broker_profile.is_approved %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+        <div class="flex items-center">
+            <i class="fas fa-clock text-yellow-500 text-2xl mr-4"></i>
+            <div>
+                <h3 class="font-semibold text-yellow-800 text-lg mb-2">En attente de validation</h3>
+                <p class="text-yellow-700">Votre compte courtier est en cours de validation par notre équipe. Vous pourrez accepter des missions une fois validé.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Mes Missions -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-tasks text-blue-500 mr-3"></i>
+                Mes Missions
+            </h2>
+
+            {% if my_missions %}
+            <div class="space-y-4">
+                {% for mission in my_missions %}
+                <div class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">{{ mission.station.name }}</h3>
+                            <p class="text-sm text-gray-600">{{ mission.station.neighborhood }}</p>
+                        </div>
+                        <span class="{% if mission.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif mission.status == 'accepted' %}bg-blue-100 text-blue-800
+                                    {% elif mission.status == 'in_progress' %}bg-orange-100 text-orange-800
+                                    {% elif mission.status == 'completed' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %} 
+                                    px-3 py-1 rounded-full text-sm font-medium">
+                            {{ mission.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="text-sm text-gray-700 mb-3">
+                        <p><strong>Type:</strong> {{ mission.get_fuel_type_display }}</p>
+                        <p><strong>Quantité:</strong> {{ mission.quantity }}L</p>
+                        {% if mission.price %}
+                        <p><strong>Prix:</strong> {{ mission.price }} FCFA</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <a href="{% url 'mission_detail' mission.id %}" 
+                           class="flex-1 bg-blue-600 text-white text-center py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">
+                            Détails
+                        </a>
+                        {% if mission.status == 'accepted' %}
+                        <a href="{% url 'update_mission_status' mission.id 'in_progress' %}" 
+                           class="flex-1 bg-orange-600 text-white text-center py-2 rounded-lg hover:bg-orange-700 text-sm font-medium">
+                            Commencer
+                        </a>
+                        {% elif mission.status == 'in_progress' %}
+                        <a href="{% url 'update_mission_status' mission.id 'completed' %}" 
+                           class="flex-1 bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 text-sm font-medium">
+                            Terminer
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                <p class="text-gray-500">Aucune mission pour le moment</p>
+                <p class="text-gray-400 text-sm mt-2">
+                    {% if not broker_profile.is_approved %}
+                    Votre compte doit être validé pour recevoir des missions
+                    {% else %}
+                    Les missions disponibles apparaîtront ici
+                    {% endif %}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Missions Disponibles -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                <i class="fas fa-bullhorn text-green-500 mr-3"></i>
+                Missions Disponibles
+            </h2>
+
+            {% if available_missions and broker_profile.is_approved %}
+            <div class="space-y-4">
+                {% for mission in available_missions %}
+                <div class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">{{ mission.station.name }}</h3>
+                            <p class="text-sm text-gray-600">{{ mission.station.neighborhood }}</p>
+                        </div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                            {{ mission.applications.count }} candidature(s)
+                        </span>
+                    </div>
+                    
+                    <div class="text-sm text-gray-700 mb-3">
+                        <p><strong>Type:</strong> {{ mission.get_fuel_type_display }}</p>
+                        <p><strong>Quantité:</strong> {{ mission.quantity }}L</p>
+                        <p><strong>Client:</strong> {{ mission.citizen.username }}</p>
+                    </div>
+                    
+                    {% if mission.special_instructions %}
+                    <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                        <p class="text-sm text-gray-700"><strong>Instructions:</strong> {{ mission.special_instructions }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <a href="{% url 'apply_mission' mission.id %}" 
+                       class="w-full bg-green-600 text-white text-center py-2 rounded-lg hover:bg-green-700 font-medium block">
+                        Postuler à cette mission
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif not broker_profile.is_approved %}
+            <div class="text-center py-8">
+                <i class="fas fa-user-clock text-gray-300 text-4xl mb-3"></i>
+                <p class="text-gray-500">Compte en attente de validation</p>
+                <p class="text-gray-400 text-sm mt-2">Vous pourrez voir les missions disponibles une fois votre compte validé</p>
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <i class="fas fa-search text-gray-300 text-4xl mb-3"></i>
+                <p class="text-gray-500">Aucune mission disponible pour le moment</p>
+                <p class="text-gray-400 text-sm mt-2">Revenez plus tard pour de nouvelles opportunités</p>
+                
+                <!-- Tips for getting missions -->
+                <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                    <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Conseils pour obtenir plus de missions
+                    </h4>
+                    <ul class="text-blue-700 text-sm space-y-1">
+                        <li>• Vérifiez régulièrement la plateforme</li>
+                        <li>• Maintenez votre profil à jour</li>
+                        <li>• Répondez rapidement aux nouvelles missions</li>
+                        <li>• Proposez des prix compétitifs</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a href="{% url 'home' %}" class="bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition">
+            <i class="fas fa-map-marker-alt text-green-500 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-gray-900 mb-2">Voir la carte</h3>
+            <p class="text-gray-600 text-sm">Consultez les stations avec du carburant disponible</p>
+        </a>
+        
+        <a href="{% url 'report_station' %}" class="bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition">
+            <i class="fas fa-plus text-blue-500 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-gray-900 mb-2">Signaler une station</h3>
+            <p class="text-gray-600 text-sm">Aidez la communauté en partageant les informations</p>
+        </a>
+        
+        <div class="bg-white border border-gray-200 rounded-xl p-6 text-center">
+            <i class="fas fa-chart-line text-purple-500 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-gray-900 mb-2">Vos performances</h3>
+            <p class="text-gray-600 text-sm">{{ broker_profile.completed_missions }} missions complétées</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

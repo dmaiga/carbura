@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer une Mission - Carbura{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+            <i class="fas fa-hand-holding-usd text-2xl text-purple-600"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Créer une Mission</h1>
+        <p class="text-lg text-gray-600">Décrivez votre besoin et les courtiers postuleront</p>
+    </div>
+
+    <!-- Station Info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+        <div class="flex items-center">
+            <i class="fas fa-gas-pump text-blue-500 text-2xl mr-4"></i>
+            <div>
+                <h3 class="font-semibold text-blue-900 text-lg">{{ station.name }}</h3>
+                <p class="text-blue-700">{{ station.neighborhood }}</p>
+                {% if station.description %}
+                <p class="text-blue-600 text-sm mt-1">{{ station.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Fuel Type -->
+            <div>
+                <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-fire mr-2 text-orange-500"></i>
+                    Type de carburant *
+                </label>
+                <select id="fuel_type" name="fuel_type" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                    <option value="essence">⛽ Essence</option>
+                    <option value="diesel">🛢️ Diesel</option>
+                    <option value="both">⛽🛢️ Les deux</option>
+                </select>
+            </div>
+
+            <!-- Quantity -->
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-weight-hanging mr-2 text-green-500"></i>
+                    Quantité souhaitée (litres) *
+                </label>
+                <input type="number" 
+                       id="quantity"
+                       name="quantity" 
+                       required
+                       min="5"
+                       max="100"
+                       step="5"
+                       value="10"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                <p class="text-sm text-gray-500 mt-1">Quantité en litres (5 à 100L)</p>
+            </div>
+
+            <!-- Special Instructions -->
+            <div>
+                <label for="special_instructions" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note mr-2 text-yellow-500"></i>
+                    Instructions spéciales (facultatif)
+                </label>
+                <textarea 
+                    id="special_instructions"
+                    name="special_instructions"
+                    rows="4"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+                    placeholder="Ex: Conteneurs fournis, heure de livraison souhaitée, point de rendez-vous..."></textarea>
+                <p class="text-sm text-gray-500 mt-1">Donnez des détails pour aider le courtier</p>
+            </div>
+
+            <!-- Pricing Info -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i class="fas fa-money-bill-wave text-yellow-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800 mb-2">Comment fonctionne le prix ?</h4>
+                        <ul class="text-yellow-700 text-sm space-y-1">
+                            <li>• Les courtiers proposeront leur prix pour la mission</li>
+                            <li>• Le prix inclut le carburant + la commission du courtier</li>
+                            <li>• Vous choisirez l'offre qui vous convient le mieux</li>
+                            <li>• Paiement en main propre au courtier</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-purple-600 text-white py-4 px-6 rounded-lg hover:bg-purple-700 font-bold text-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-rocket mr-3"></i>
+                    Publier la mission
+                </button>
+                <p class="text-center text-gray-500 text-sm mt-3">
+                    🚀 Votre mission sera visible par tous les courtiers disponibles
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

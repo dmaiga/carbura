@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Devenir Courtier - Carbura{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+            <i class="fas fa-briefcase text-2xl text-blue-600"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Devenir Courtier</h1>
+        <p class="text-lg text-gray-600">Proposez vos services et aidez la communauté à trouver du carburant</p>
+    </div>
+
+    <!-- Benefits -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+            <i class="fas fa-money-bill-wave text-green-600 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-green-800 mb-2">Gagnez de l'argent</h3>
+            <p class="text-green-700 text-sm">Proposez vos services contre rémunération</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+            <i class="fas fa-users text-blue-600 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-blue-800 mb-2">Aidez la communauté</h3>
+            <p class="text-blue-700 text-sm">Soyez utile à ceux qui ne peuvent pas faire la queue</p>
+        </div>
+        <div class="bg-purple-50 border border-purple-200 rounded-xl p-6 text-center">
+            <i class="fas fa-star text-purple-600 text-2xl mb-3"></i>
+            <h3 class="font-semibold text-purple-800 mb-2">Construisez votre réputation</h3>
+            <p class="text-purple-700 text-sm">Obtenez des avis et augmentez votre visibilité</p>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-user-tie mr-2 text-blue-500"></i>
+                    Présentez vos services *
+                </label>
+                <textarea 
+                    id="description"
+                    name="description"
+                    rows="4"
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    placeholder="Ex: Je suis disponible pour faire la queue et acheter du carburant dans les stations de Badalabougou. Horaires flexibles..."></textarea>
+                <p class="text-sm text-gray-500 mt-1">Décrivez vos disponibilités et zones d'intervention</p>
+            </div>
+
+            <!-- Terms -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-yellow-500 mt-1 mr-3"></i>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800 mb-2">Conditions à respecter</h4>
+                        <ul class="text-yellow-700 text-sm space-y-1">
+                            <li>• Votre profil devra être validé par un administrateur</li>
+                            <li>• Vous vous engagez à fournir un service professionnel</li>
+                            <li>• Les prix doivent être justes et transparents</li>
+                            <li>• Respectez les horaires convenus avec les clients</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 font-bold text-lg transition duration-200 flex items-center justify-center">
+                    <i class="fas fa-paper-plane mr-3"></i>
+                    Soumettre ma candidature
+                </button>
+                <p class="text-center text-gray-500 text-sm mt-3">
+                    ⏳ Votre demande sera traitée sous 24h par notre équipe
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+# ==========================
+# Django & Python
+# ==========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ==========================
+# Environnement virtuel
+# ==========================
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+Scripts/
+bin/
+Lib/
+Include/
+
+# ==========================
+# Base de données locale
+# ==========================
+db.sqlite3
+db.sqlite3-journal
+
+# ==========================
+# Fichiers de logs et caches
+# ==========================
+*.log
+*.pot
+*.pyc
+*.tmp
+*.pid
+*.seed
+*.coverage
+*.mypy_cache/
+*.pytest_cache/
+__pycache__/
+*.cache/
+.DS_Store
+
+# ==========================
+# Static & Media files
+# ==========================
+staticfiles/
+static_root/
+media/
+media_root/
+collectstatic/
+static/
+
+# ==========================
+# IDE / Éditeurs
+# ==========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.orig
+
+# ==========================
+# Config et système
+# ==========================
+.env
+.env.local
+.env.prod
+.env.dev
+*.env
+*.ini
+*.cfg
+*.config
+*.json
+*.yaml
+*.yml
+
+# ==========================
+# OS Files
+# ==========================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
