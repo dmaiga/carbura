@@ -1,5 +1,8 @@
 #!/bin/bash
-set -e  # Arrêter le script si une commande échoue
+set -e
+
+echo "📦 Installation des dépendances..."
+pip install -r requirements.txt
 
 echo "🔍 Vérification des migrations manquantes..."
 if ! python manage.py makemigrations --check --dry-run; then
@@ -19,7 +22,6 @@ if not User.objects.filter(username='admin').exists():
     User.objects.create_superuser(
         username='admin',
         password='changeMe'
-        
     )
     print('✅ Superuser créé !')
 else:
@@ -30,4 +32,3 @@ echo "📂 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput
 
 echo "✅ Setup terminé !"
-
