@@ -1,0 +1,7 @@
+# Core Django
+Django==5.1.2
+
+# Serveur production & statics
+gunicorn==23.0.0
+whitenoise==6.6.0
+
