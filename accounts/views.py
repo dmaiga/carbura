@@ -5,46 +5,85 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth import login,authenticate
+from django.contrib.auth.decorators import login_required
+from .forms import CustomUserCreationForm,CustomAuthenticationForm
+from brokers.models import Broker
+from django.db.models import Q
 
 def custom_logout(request):
     logout(request)
     return redirect('home')
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm
-from brokers.models import Broker
+
+def custom_login(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Bienvenue {user.username} !")
+                
+                # Redirection selon le type d'utilisateur
+                if user.user_type == 'broker':
+                    return redirect('broker_dashboard')
+                else:
+                    return redirect('home')
+            else:
+                messages.error(request, "Identifiants invalides.")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+    else:
+        form = CustomAuthenticationForm()
+    
+    return render(request, 'registration/login.html', {'form': form})
+
+from django.contrib.auth import login, authenticate
 
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            # Le user_type est maintenant sauvegardé via le formulaire
-            user.save()
+            user = form.save()
             
             # Si l'utilisateur s'inscrit en tant que courtier, créer son profil courtier
             if user.user_type == 'broker':
                 Broker.objects.create(
                     user=user,
-                    is_approved=False,  # Doit être approuvé par l'admin
+                    is_approved=False,
                     description=f"Courtier inscrit le {user.date_joined.strftime('%d/%m/%Y')}"
                 )
             
-            login(request, user)
+            # Authentifier l'utilisateur avec ses identifiants
+            user = authenticate(
+                request,
+                username=user.username,  # ou user.email, user.phone
+                password=form.cleaned_data.get('password1')
+            )
             
-            # Redirection basée sur le type d'utilisateur
-            if user.user_type == 'broker':
-                messages.success(request, "🎉 Bienvenue courtier ! Votre compte est en attente de validation.")
-                return redirect('broker_dashboard')
+            if user is not None:
+                login(request, user)
+                
+                # Redirection basée sur le type d'utilisateur
+                if user.user_type == 'broker':
+                    messages.success(request, "🎉 Bienvenue courtier ! Votre compte est en attente de validation.")
+                    return redirect('broker_dashboard')
+                else:
+                    messages.success(request, "🎉 Bienvenue sur Carbura ! Commencez à explorer les stations près de chez vous.")
+                    return redirect('home')
             else:
-                messages.success(request, "🎉 Bienvenue sur Carbura ! Commencez à explorer les stations près de chez vous.")
-                return redirect('home')
+                messages.error(request, "Erreur lors de la connexion automatique. Veuillez vous connecter manuellement.")
+                return redirect('login')
     else:
         form = CustomUserCreationForm()
     
     return render(request, 'registration/signup.html', {'form': form})
+
 
 @login_required
 def profile(request):
